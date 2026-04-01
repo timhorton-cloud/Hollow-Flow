@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Hollow-Flow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f0f0f">
+
+<style>
+body{margin:0;background:#0f0f0f;color:#ddd;font-family:Arial;text-align:center}
+.panel{margin:20px auto;width:95%;max-width:500px;padding:20px;border-radius:14px;background:#1a1a1a}
+#output{background:#000;padding:12px;border-radius:10px;margin-top:10px;max-height:260px;min-height:260px;overflow:auto}
+
+.mobileBar{
+position:fixed;bottom:0;left:0;width:100%;
+display:flex;gap:8px;padding:10px;
+background:rgba(0,0,0,0.9);border-top:1px solid #222;
+}
+
+.mBtn{
+flex:1;padding:12px;border-radius:10px;
+background:#111;color:#ddd;border:1px solid #333;
+display:flex;justify-content:center;align-items:center;gap:6px;
+}
+
+.mBtn.primary{background:#ff3b3b;color:#fff}
+
+.mSelect{
+flex:1;padding:12px;border-radius:10px;
+background:#111;color:#ddd;border:1px solid #333;
+}
+</style>
+</head>
+
+<body>
+
+<div class="panel">
+<h2>Hollow-Flow</h2>
+<pre id="output"></pre>
+</div>
+
+<div class="mobileBar">
+<button onclick="generateLyrics()" class="mBtn primary">● Generate</button>
+<button onclick="generateLyrics(true)" class="mBtn">↻ Remix</button>
+<button onclick="saveTake()" class="mBtn">💾 Save</button>
+<button onclick="toggleLock()" id="lockBtn" class="mBtn">🔒 Lock</button>
+<select id="preset" onchange="applyPreset()" class="mSelect">
+<option value="">Preset</option>
+<option value="trap_fire">Trap</option>
+<option value="boom_bap_real">Boom</option>
+<option value="worship_vibe">Worship</option>
+</select>
+</div>
+
+<script>
+
+let state={beat:0,flow:0,mood:0,heat:0};
+let locked=false;
+let takes=[];
+
+function toggleLock(){
+  locked=!locked;
+  document.getElementById("lockBtn").innerText = locked ? "🔓 Unlock" : "🔒 Lock";
+}
+
+function applyPreset(){
+  const p=document.getElementById("preset").value;
+  if(p==="trap_fire") state={beat:3,flow:2,mood:1,heat:3};
+  if(p==="boom_bap_real") state={beat:1,flow:1,mood:0,heat:1};
+  if(p==="worship_vibe") state={beat:0,flow:0,mood:3,heat:1};
+}
+
+function saveTake(){
+  const text=document.getElementById("output").innerText;
+  if(!text) return;
+  takes.push(text);
+  alert("Saved Take #"+takes.length);
+}
+
+async function generateLyrics(variation=false){
+
+const output=document.getElementById("output");
+output.innerText="Generating...";
+
+const prompt = "Christian rap lyrics, 2 verses, rhyming";
+
+try{
+const res=await fetch("/lyrics",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt})
+});
+const data=await res.json();
+output.innerText=data.text;
+}catch(e){
+output.innerText="Server not running";
+}
+
+}
+</script>
+
+</body>
+</html>
