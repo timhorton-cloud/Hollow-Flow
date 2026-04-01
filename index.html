@@ -444,7 +444,7 @@ ${variation ? 'Make this a DIFFERENT variation with new phrasing and structure.'
 
   try{
 
-    const res = await fetch("http://localhost:3000/lyrics", {
+    const res = await fetch("/lyrics", {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
       body: JSON.stringify({ prompt })
