@@ -56,6 +56,7 @@ canvas{
   cursor:pointer;
   background:radial-gradient(circle,#333,#000);
   border:2px solid #111;
+  touch-action: none;
 }
 
 /* DOTS */
@@ -291,13 +292,43 @@ function makeKnob(name){
     window.removeEventListener("mouseup",up);
   }
 
-  knob.addEventListener("mousedown",(e)=>{
-    dragging=true;
-    startY=e.clientY;
-    startAngle=angle;
-    window.addEventListener("mousemove",move);
-    window.addEventListener("mouseup",up);
-  });
+  // DESKTOP
+knob.addEventListener("mousedown",(e)=>{
+  dragging=true;
+  startY=e.clientY;
+  startAngle=angle;
+  window.addEventListener("mousemove",move);
+  window.addEventListener("mouseup",up);
+});
+
+// MOBILE
+knob.addEventListener("touchstart",(e)=>{
+  dragging=true;
+  startY=e.touches[0].clientY;
+  startAngle=angle;
+  window.addEventListener("touchmove",moveTouch);
+  window.addEventListener("touchend",upTouch);
+});
+
+// TOUCH MOVE
+function moveTouch(e){
+  if(!dragging) return;
+
+  let delta=(startY - e.touches[0].clientY)*0.5;
+  angle=startAngle + delta;
+  angle=Math.max(-210,Math.min(30,angle));
+
+  index=Math.round((angle+210)/80);
+  index=Math.max(0,Math.min(3,index));
+  state[name]=index;
+}
+
+// TOUCH END
+function upTouch(){
+  dragging=false;
+  window.removeEventListener("touchmove",moveTouch);
+  window.removeEventListener("touchend",upTouch);
+}
 
   render();
   return wrap;
@@ -486,3 +517,4 @@ ${variation ? 'Make this a DIFFERENT variation with new phrasing and structure.'
 </div>
 
 </body>
+</html>
