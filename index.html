@@ -272,19 +272,20 @@ function makeKnob(name){
   }
 
   function move(e){
-    if(!dragging) return;
+  if(!dragging) return;
 
-    let delta=(startY-e.clientY)*0.5;
-    angle=startAngle+delta;
-    angle=Math.max(-210,Math.min(30,angle));
+  let clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    index=Math.round((angle+210)/80);
-    index=Math.max(0,Math.min(3,index));
-    state[name]=index;
-    
+  let delta = (startY - clientY) * 0.5;
 
-    
-  }
+  angle = startAngle + delta;
+  angle = Math.max(-210, Math.min(30, angle));
+
+  index = Math.round((angle + 210) / 80);
+  index = Math.max(0, Math.min(3, index));
+
+  state[name] = index;
+}
 
   function up(){
     dragging=false;
@@ -303,25 +304,16 @@ knob.addEventListener("mousedown",(e)=>{
 
 // MOBILE
 knob.addEventListener("touchstart",(e)=>{
-  dragging=true;
-  startY=e.touches[0].clientY;
-  startAngle=angle;
-  window.addEventListener("touchmove",moveTouch);
-  window.addEventListener("touchend",upTouch);
+  e.preventDefault(); // 🚨 THIS FIXES MOBILE
+
+  dragging = true;
+  startY = e.touches[0].clientY;
+  startAngle = angle;
+
+  window.addEventListener("touchmove", move, { passive: false });
+  window.addEventListener("touchend", upTouch);
 });
 
-// TOUCH MOVE
-function moveTouch(e){
-  if(!dragging) return;
-
-  let delta=(startY - e.touches[0].clientY)*0.5;
-  angle=startAngle + delta;
-  angle=Math.max(-210,Math.min(30,angle));
-
-  index=Math.round((angle+210)/80);
-  index=Math.max(0,Math.min(3,index));
-  state[name]=index;
-}
 
 // TOUCH END
 function upTouch(){
